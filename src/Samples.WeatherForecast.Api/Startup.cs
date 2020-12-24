@@ -28,6 +28,8 @@ namespace Samples.WeatherForecast.Api
         {
 
             services.AddControllers();
+            services.AddHealthChecks();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Samples.WeatherForecast.Api", Version = "v1" });
@@ -53,6 +55,7 @@ namespace Samples.WeatherForecast.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
