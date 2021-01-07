@@ -21,16 +21,17 @@ RUN dotnet publish \
 # Final stage/image
 FROM mcr.microsoft.com/dotnet/runtime-deps:${VERSION}
 
-RUN addgroup -S dotnetgroup && \
-    adduser -S dotnet
-USER dotnet
+RUN addgroup -g 1000 dotnet && \
+    adduser -u 1000 -G dotnet -s /bin/sh -D dotnet
 
 WORKDIR /app
-COPY --chown=dotnet:dotnetgroup --from=publish /out .
+COPY --chown=dotnet:dotnet --from=publish /out .
 
-EXPOSE 8080
+ENV ASPNETCORE_URLS=http://*:8080
 
 HEALTHCHECK --interval=60s --timeout=3s --retries=3 \
-    CMD wget localhost:80/health -q -O - > /dev/null 2>&1
+    CMD wget localhost:8080/health -q -O - > /dev/null 2>&1
 
+USER dotnet
+EXPOSE 8080
 ENTRYPOINT ["./Samples.WeatherForecast.Api"]
